@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TechLearn + School Projects ZW</title>
+<style>
+  :root { --bg:#0f172a; --card:#1e293b; --text:#e2e8f0; --accent:#38bdf8; --ok:#22c55e; }
+.light { --bg:#f8fafc; --card:#fff; --text:#0f172a; --accent:#0284c7; }
+  *{box-sizing:border-box}
+  body { margin:0; font-family: Inter, system-ui; background:var(--bg); color:var(--text); }
+  header { padding:12px 16px; background:var(--card); position:sticky; top:0; z-index:20; }
+  nav { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+  nav button { padding:8px 14px; border:1px solid var(--accent); background:transparent; color:var(--text); border-radius:8px; cursor:pointer; font-weight:600; }
+  nav button.active { background:var(--accent); color:#fff; }
+ .toggle { position:absolute; right:16px; top:12px; cursor:pointer; border:1px solid var(--accent); padding:6px 12px; border-radius:8px; font-size:14px; }
+ .wrap { max-width:1100px; margin:20px auto; padding:0 16px; }
+ .tab { display:none; }
+ .tab.active { display:block; }
+ .grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:16px; }
+ .card { background:var(--card); padding:16px; border-radius:16px; }
+ .card h3 { margin:0 0 6px; }
+  details { margin-top:10px; }
+ .lesson { padding:12px; margin:8px 0; background:rgba(0,0,0,.1); border-radius:10px; }
+ .lesson iframe { width:100%; height:400px; border:0; border-radius:8px; }
+ .btn { padding:8px 14px; background:var(--accent); color:#fff; border-radius:10px; border:none; cursor:pointer; font-weight:600; text-decoration:none; display:inline-block; }
+ .done { background:var(--ok)!important; }
+ .progress-wrap { background:var(--card); padding:14px; border-radius:12px; margin-bottom:20px; }
+ .bar { height:12px; background:#334155; border-radius:999px; overflow:hidden; }
+ .bar > div { height:100%; width:0%; background:var(--ok); transition:.4s; }
+ .search { display:flex; gap:8px; margin-bottom:16px; }
+ .search input { flex:1; padding:12px; border-radius:10px; border:1px solid #334155; background:var(--card); color:var(--text); font-size:16px; }
+ .tag { font-size:12px; opacity:.8; }
+ .loading { text-align:center; opacity:.7; padding:20px; }
+  footer { text-align:center; padding:24px; opacity:.7; font-size:14px; }
+</style>
+</head>
+<body>
+  <header>
+    <span class="toggle" onclick="document.body.classList.toggle('light')">🌓</span>
+    <nav>
+      <button class="active" onclick="showTab('courses')">📚 Courses</button>
+      <button onclick="showTab('search')">🔍 Project Search</button>
+      <button onclick="showTab('scraper')">🕸️ Scraper</button>
+    </nav>
+  </header>
+
+  <div class="wrap">
+    <!-- TAB 1: COURSES -->
+    <div id="courses" class="tab active">
+      <div class="progress-wrap">
+        <b>Your Progress: <span id="pct">0%</span></b>
+        <div class="bar"><div id="fill"></div></div>
+      </div>
+      <div class="grid" id="coursesGrid"></div>
+    </div>
+
+    <!-- TAB 2: PROJECT SEARCH -->
+    <div id="search" class="tab">
+      <div class="search">
+        <input id="q" placeholder="Search: 'O Level Physics', 'Shona essay', 'Solar system'...">
+        <button class="btn" onclick="searchAll()">Search</button>
+      </div>
+      <div id="results" class="grid"></div>
+    </div>
+
+    <!-- TAB 3: SCRAPER -->
+    <div id="scraper" class="tab">
+      <div class="card">
+        <h3>🕸️ Real Web Scraper</h3>
+        <p>Browsers block Google. Use this with a tiny Node.js backend.</p>
+        <div class="search">
+          <input id="scrapeQ" placeholder="Scrape Google/DuckDuckGo: 'grade 7 science project'">
+          <button class="btn" onclick="scrape()">Scrape</button>
+        </div>
+        <div id="scrapeResults" class="grid"></div>
+        <p class="tag">Backend code below ↓ Copy to `server.js`</p>
+        <pre style="background:#0003;padding:12px;border-radius:8px;overflow:auto;font-size:12px;">
+npm i express cheerio cors node-fetch
+// server.js
+import express from 'express'; import cheerio from 'cheerio'; 
+import fetch from 'node-fetch'; import cors from 'cors';
+const app = express(); app.use(cors());
+app.get('/scrape', async (req,res)=>{
+  const q = req.query.q;
+  const html = await fetch(`https://html.duckgo.com/html/?q=${q}`).then(r=>r.text());
+  const $ = cheerio.load(html);
+  const results = [];
+  $('.result__a').each((i,el)=>{
+    results.push({title: $(el).text(), url: $(el).attr('href')});
+  });
+  res.json(results.slice(0,10));
+});
+app.listen(3000,()=>console.log('http://localhost:3000'))</pre>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2026 TechLearn ZW | Courses + Projects + Scraper in 1</footer>
+
+<script>
+function showTab(id){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+/* ===== COURSES CODE ===== */
+const COURSES = [
+  {
+    id: "webdev",
+    title: "🚀 Web Development",
+    desc: "HTML, CSS, JS, PHP, Node.js. Full PDF.",
+    lessons: [
+      {t:"Full Book PDF", c:`<a href="https://freecomputerbooks.com/practical-web-development-paul-wellens.html" target="_blank" class="btn">Open PDF</a>`},
+      {t:"HTML + CSS Basics", c:`<p>Ch 1-2: Structure, tags, Box Model, Flex, Grid</p>`},
+      {t:"JavaScript + jQuery", c:`<p>Ch 3-4: DOM, events, Ajax, JSON</p>`},
+      {t:"Backend + Node.js", c:`<p>Ch 5-6: PHP, MySQL, Node.js, Responsive</p>`}
+    ]
+  },
+  {
+    id: "ai",
+    title: "🤖 AI & Chatbots", 
+    desc: "WhatsApp bots, OpenAI, Shona/Ndebele.",
+    lessons: [
+      {t:"WhatsApp Cloud API", c:`<p>Meta Dev > WhatsApp > Token. Webhook verify.</p>`},
+      {t:"OpenAI + Shona", c:`<p>Prompt: "Reply in Shona. User said: {{msg}}"</p>`},
+      {t:"Escalate to Human", c:`<p>If unsure, send: "Let me get a human"</p>`},
+      {t:"Build EmmyBot v1", c:`<p>Combine API + bot + localStorage memory.</p>`}
+    ]
+  },
+  {
+    id: "cyber",
+    title: "🔒 Cybersecurity Basics",
+    desc: "Cloudwards PDF: 9 chapters. Free.",
+    lessons: [
+      {t:"Full Course PDF", c:`<iframe src="https://www.cloudwards.net/courses/cybersecurity-encryption-101/"></iframe><a href="https://www.cloudwards.net/courses/cybersecurity-encryption-101/" target="_blank" class="btn">Download PDF</a>`},
+      {t:"Passwords: 80% of Hacks", c:`<p>Avoid: 12345, birthdays, default passwords</p>`},
+      {t:"VPN & Antivirus Hype", c:`<p>What actually protects you</p>`},
+      {t:"Encryption Explained", c:`<p>How crypto keeps your data safe</p>`}
+    ]
+  }
+];
+
+let progress = JSON.parse(localStorage.getItem('techlearn_progress') || '{}');
+function save() { localStorage.setItem('techlearn_progress', JSON.stringify(progress)); updateBar(); }
+function toggle(id, i) {
+  progress[id] = progress[id] || [];
+  progress[id][i] =!progress[id][i];
+  save(); renderCourses();
+}
+function updateBar() {
+  let total = 0, done = 0;
+  COURSES.forEach(c => { total += c.lessons.length; done += (progress[c.id]||[]).filter(Boolean).length; });
+  const pct = total? Math.round(done*100/total) : 0;
+  document.getElementById('fill').style.width = pct + '%';
+  document.getElementById('pct').textContent = pct + '%';
+}
+function renderCourses() {
+  document.getElementById('coursesGrid').innerHTML = COURSES.map(c => `
+    <div class="card">
+      <h3>${c.title}</h3>
+      <p>${c.desc}</p>
+      <details open>
+        <summary>Lessons (${(progress[c.id]||[]).filter(Boolean).length}/${c.lessons.length})</summary>
+        ${c.lessons.map((l,i) => `
+          <div class="lesson">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+              <b>${i+1}. ${l.t}</b>
+              <button class="btn ${progress[c.id]?.[i]? 'done':''}" onclick="toggle('${c.id}',${i})">
+                ${progress[c.id]?.[i]? '✓ Done':'Mark'}
+              </button>
+            </div>
+            <div>${l.c}</div>
+          </div>
+        `).join('')}
+      </details>
+    </div>
+  `).join('');
+  updateBar();
+}
+renderCourses();
+
+/* ===== PROJECT SEARCH CODE ===== */
+async function searchAll() {
+  const query = document.getElementById('q').value.trim();
+  if(!query) return;
+  const results = document.getElementById('results');
+  results.innerHTML = `<div class="loading">Searching Wikipedia + Open Library + Web...</div>`;
+
+  const sources = await Promise.all([searchWikipedia(query), searchOpenLibrary(query), searchDuckGo(query)]);
+  const all = sources.flat().slice(0, 20);
+  results.innerHTML = all.length? all.map(r => `
+    <div class="card">
+      <h3><a href="${r.url}" target="_blank">${r.title}</a></h3>
+      <p>${r.desc}</p>
+      <div class="tag">${r.source}</div>
+    </div>
+  `).join('') : `<div class="loading">No results. Try different keywords.</div>`;
+}
+async function searchWikipedia(q) {
+  try {
+    const res = await fetch(`https://en.wikipedia.org/w/api.php?action=opensearch&format=json&origin=*&search=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    return data[1].map((t,i)=>({title: t, url: data[3][i], desc: 'Wikipedia article', source: 'Wikipedia'}));
+  } catch { return []; }
+}
+async function searchOpenLibrary(q) {
+  try {
+    const res = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=5`);
+    const data = await res.json();
+    return data.docs.map(d=>({title: d.title, url: `https://openlibrary.org${d.key}`, desc: d.first_sentence?.value || 'Free book', source: 'Open Library'}));
+  } catch { return []; }
+}
+async function searchDuckGo(q) {
+  try {
+    const res = await fetch(`https://api.duckgo.com/?q=${encodeURIComponent(q)}&format=json&no_html=1&skip_disambig=1`);
+    const data = await res.json();
+    return data.RelatedTopics.slice(0,5).map(t=>({title: t.Text.split(' - ')[0], url: t.FirstURL, desc: t.Text, source: 'DuckGo'}));
+  } catch { return []; }
+}
+document.getElementById('q').addEventListener('keypress', e=>{ if(e.key==='Enter') searchAll(); });
+
+/* ===== SCRAPER CODE ===== */
+async function scrape() {
+  const q = document.getElementById('scrapeQ').value.trim();
+  if(!q) return;
+  const box = document.getElementById('scrapeResults');
+  box.innerHTML = `<div class="loading">Scraping... Make sure server.js is running on port 3000</div>`;
+  try {
+    const res = await fetch(`http://localhost:3000/scrape?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    box.innerHTML = data.map(r=>`
+      <div class="card"><h3><a href="${r.url}" target="_blank">${r.title}</a></h3><div class="tag">${r.url}</div></div>
+    `).join('');
+  } catch {
+    box.innerHTML = `<div class="loading">Error: Start backend with 'node server.js' first</div>`;
+  }
+}
+document.getElementById('scrapeQ').addEventListener('keypress', e=>{ if(e.key==='Enter') scrape(); });
+</script>
+</body>
+</html>
